@@ -1,33 +1,35 @@
 #include <SFML/Graphics.hpp>
+
 #include "headers/ant.h"
 #include "headers/pixelArray.h"
+#include "headers/application.h"
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode(400,400), "Langton's Ant");
 
-    PixelArray pixelArray(400,400);
+    int width = 640;
+    int height = 480;
+    int FPS = 30;
 
-    Ant ant(120,120);
+    Application window(width, height, "Langton's Ant");
+    window.limitFPS(FPS);
 
-    window.setFramerateLimit(30);
+    PixelArray pixelArray(width, height);
 
-    while (window.isOpen()) {
+    Ant ant(width/2, height/2);
 
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+    while (window.isRunning) {
+
+        window.checkCloseState();
+
         bool curState = false;
 
-        int index = ant.y * 400 + ant.x;
+        int index = ant.y * width + ant.x;
 
         if (pixelArray.pixels[index] == 0) {
             curState = true;
         }
 
         ant.move(curState);
-
-
 
         if (pixelArray.pixels[index] == 0) {
             pixelArray.pixels[index] = 255;
@@ -45,9 +47,10 @@ int main() {
             pixelArray.update();
         }
 
-        window.clear();
-        window.draw(pixelArray.sprite);
-        window.display();
+        window.update(pixelArray.sprite);
     }
+
+    window.terminate();
+
     return 0;
 }
